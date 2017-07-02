@@ -6,6 +6,7 @@
 'use strict';
 
 var fs = require('fs');
+var imageSearch = require('node-google-image-search');
 var express = require('express');
 var app = express();
 
@@ -37,6 +38,11 @@ app.route('/')
     .get(function(req, res) {
 		  res.sendFile(process.cwd() + '/views/index.html');
     })
+
+app.get('/api/imagesearch', function(req, res) {
+  console.log(req.query);
+  res.json(req.query);
+});
 
 // Respond not found to all the wrong routes
 app.use(function(req, res, next){
