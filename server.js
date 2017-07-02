@@ -9,9 +9,20 @@ var fs = require('fs');
 var request = require('request');
 var query = require('query-string');
 var express = require('express');
+var mongodb = require('mongodb').MongoClient;
 var app = express();
 
 const ENDPOINT = "https://www.googleapis.com/customsearch/v1";
+
+function save_search(query) {
+  mongodb.connect(process.env.MONGO_URI, function(err, db) {
+    if (err) throw err;
+    db.collection("searches").insert({
+      term: query,
+      when: new Date()
+    })
+  });
+}
 
 if (!process.env.DISABLE_XORIGIN) {
   app.use(function(req, res, next) {
@@ -41,6 +52,19 @@ app.route('/')
     .get(function(req, res) {
 		  res.sendFile(process.cwd() + '/views/index.html');
     })
+
+app.get('/api/latestsearches', function(req, res) {
+  mongodb.connect(process.env.MONGO_URI, function(err, db) {
+    if (err) throw err;
+    var offset = req.query.offset || 0;
+    var count = req.query.count || 10;
+    db.collection("searches").find().skip(offset).limit(count).toArray(function(err, data) {
+      if (err) throw err;
+      db.close();
+      res.json(data);
+    });
+  });
+});
 
 app.get('/api/imagesearch', function(req, res) {
   request(ENDPOINT + "?" + query.stringify({

@@ -3,7 +3,8 @@
   "dependencies": {
     "express": "^4.15.3",
     "request": "^2.81.0",
-    "query-string": "^4.3.4"
+    "query-string": "^4.3.4",
+    "mongodb": "^2.2.29"
   },
   "main": "server.js",
   "scripts": {
