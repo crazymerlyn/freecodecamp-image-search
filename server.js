@@ -46,7 +46,7 @@ app.get('/api/imagesearch', function(req, res) {
   request(ENDPOINT + "?" + query.stringify({
     q: req.query.q,
     num: req.query.num || 10,
-    start: req.query.offset,
+    start: +req.query.offset + 1,
     imgSize: "small",
     searchType: "image",
     key: process.env.API_KEY,
