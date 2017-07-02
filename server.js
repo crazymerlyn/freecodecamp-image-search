@@ -19,7 +19,7 @@ function save_search(query) {
     if (err) throw err;
     db.collection("searches").insert({
       term: query,
-      when: new Date()
+      when: new Date().toISOString()
     })
   });
 }
@@ -58,7 +58,9 @@ app.get('/api/latestsearches', function(req, res) {
     if (err) throw err;
     var offset = req.query.offset || 0;
     var count = req.query.count || 10;
-    db.collection("searches").find().skip(offset).limit(count).toArray(function(err, data) {
+    db.collection("searches").find({}, {_id: 0})
+      .sort({when: -1})
+      .skip(offset).limit(count).toArray(function(err, data) {
       if (err) throw err;
       db.close();
       res.json(data);
@@ -67,17 +69,20 @@ app.get('/api/latestsearches', function(req, res) {
 });
 
 app.get('/api/imagesearch', function(req, res) {
+  save_search(req.query.q);
   request(ENDPOINT + "?" + query.stringify({
     q: req.query.q,
     num: req.query.num || 10,
-    start: +req.query.offset + 1,
+    start: +(req.query.offset || 0) + 1,
     imgSize: "small",
     searchType: "image",
     key: process.env.API_KEY,
     cx: process.env.GOOGLE_CX
   }), function(err, response, body) {
     if (err) throw err;
-    var items = JSON.parse(body).items;
+    var items = JSON.parse(body).items || [];
+    console.log(body);
+    console.log(items);
     var results = items.map(function(item) {
       return {
         url: item.link,
