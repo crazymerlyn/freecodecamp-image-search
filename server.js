@@ -6,9 +6,12 @@
 'use strict';
 
 var fs = require('fs');
-var imageSearch = require('node-google-image-search');
+var request = require('request');
+var query = require('query-string');
 var express = require('express');
 var app = express();
+
+const ENDPOINT = "https://www.googleapis.com/customsearch/v1";
 
 if (!process.env.DISABLE_XORIGIN) {
   app.use(function(req, res, next) {
@@ -40,8 +43,12 @@ app.route('/')
     })
 
 app.get('/api/imagesearch', function(req, res) {
-  console.log(req.query);
-  res.json(req.query);
+  request(ENDPOINT + query.stringify({
+    q: req.query.q,
+    num: req.query.num || 10,
+    start: req.query.offset,
+    imgSize: "small"
+  }));
 });
 
 // Respond not found to all the wrong routes

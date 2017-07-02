@@ -2,7 +2,8 @@
   "name": "fcc-learn-npm-package-json",
   "dependencies": {
     "express": "^4.15.3",
-    "node-google-image-search": "^1.0.3"
+    "request": "^2.81.0",
+    "query-string": "^4.3.4"
   },
   "main": "server.js",
   "scripts": {
