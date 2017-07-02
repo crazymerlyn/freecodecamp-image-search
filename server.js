@@ -43,12 +43,27 @@ app.route('/')
     })
 
 app.get('/api/imagesearch', function(req, res) {
-  request(ENDPOINT + query.stringify({
+  request(ENDPOINT + "?" + query.stringify({
     q: req.query.q,
     num: req.query.num || 10,
     start: req.query.offset,
-    imgSize: "small"
-  }));
+    imgSize: "small",
+    searchType: "image",
+    key: process.env.API_KEY,
+    cx: process.env.GOOGLE_CX
+  }), function(err, response, body) {
+    if (err) throw err;
+    var items = JSON.parse(body).items;
+    var results = items.map(function(item) {
+      return {
+        url: item.link,
+        snippet: item.snippet,
+        thumbnail: item.image.thumbnailLink,
+        context: item.image.contextLink
+      }
+    });
+    res.json(results);
+  });
 });
 
 // Respond not found to all the wrong routes
